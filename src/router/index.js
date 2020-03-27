@@ -13,6 +13,11 @@ const routes = [
 				path:'/register',
 				//懒加载
 				component:()=>import('@/views/Register.vue')
+			},
+			{
+				path:'/personal',
+				//懒加载
+				component:()=>import('@/views/Personal.vue')
 			}
 ]
 

@@ -40,7 +40,10 @@ export default {
 		  		data: this.form
 		  	}).then(res => {
 					this.$toast(res.data.message)
-		  		
+					console.log(res.data)
+					const {data} = res.data
+					localStorage.setItem('userInfo',JSON.stringify(data))
+					this.$router.push('/personal')
 		  	})
 			
 		}
