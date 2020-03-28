@@ -3,12 +3,8 @@
 		<div class="w">
 			<div class="top"></div>
 			<div class="middle">
-				<div class="middle_tap">
-					<span class="zuo iconfont iconjiantou" @click="$router.back()"></span>
-					<h3>个人中心</h3>
-					<span class="home iconfont iconshouye" @click="$router.push('/login')"></span>
-				</div>
-				<div class="middle_top">
+				<tab title="个人中心" :home="true"/>
+				<div class="middle_top" @click="$router.push('/edit')">
 					<div class="left">
 						<div><img :src="'http://127.0.0.1:3000'+infoList.head_img"></div>
 						<div class="xingbie">
@@ -32,6 +28,7 @@
 <script>
 import list from '@/components/list.vue'
 import moment from 'moment'
+import tab from '@/components/tab.vue'
 export default{
 	data(){
 		return {
@@ -54,12 +51,13 @@ export default{
 		}
 	},
 	components:{
-			list
+			list,
+			tab
 		},
 	mounted(){
 		const users = JSON.parse(localStorage.getItem('userInfo'))
 		this.$axios({
-			url:'http://127.0.0.1:3000/user/' + users.user.id,
+			url:'/user/' + users.user.id,
 			headers:{
 				Authorization:users.token
 			}
@@ -77,7 +75,7 @@ export default{
 	
 </script>
 
-<style lang="less">
+<style lang="less" scoped="scoped">
 	.w {
 		margin: 0 auto;
 		width: 360 / 375 * 100vw;
@@ -88,23 +86,7 @@ export default{
 		.middle {
 			height: 635px;
 			background: rgba(242, 242, 242, 1);
-			.middle_tap{
-				padding: 0 10px;
-				padding-top: 10px;
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				.home{
-					font-size: 18px;
-				}
-				.zuo{
-					font-size: 16px;
-					color: #9b9191;
-				}
-				h3{
-					color: #23bfbf;
-				}
-			}
+
 			.middle_top{
 				padding: 20 / 360 * 100vw;
 				padding-right:10 / 360 * 100vw; 
