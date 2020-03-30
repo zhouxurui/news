@@ -23,6 +23,21 @@ const routes = [
 				path:'/edit',
 				//懒加载
 				component:()=>import('@/views/Edit.vue')
+			},
+			{
+				path:'/follow',
+				//懒加载
+				component:()=>import('@/views/Follow.vue')
+			},
+			{
+				path:'/thread',
+				//懒加载
+				component:()=>import('@/views/Thread.vue')
+			},
+			{
+				path:'/collect',
+				//懒加载
+				component:()=>import('@/views/Collect.vue')
 			}
 ]
 

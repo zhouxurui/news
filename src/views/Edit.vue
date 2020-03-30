@@ -12,7 +12,7 @@
 				<van-dialog v-model="show" title="昵称" show-cancel-button @confirm="conf" @cancel="dataname=datas.nickname"><van-field v-model="dataname" placeholder="请输入昵称" /></van-dialog>
 				<list title="密码" tip="******" @click.native="shows=true" />
 				<van-dialog v-model="shows" title="密码" show-cancel-button @confirm="pwd" @cancel="password=''"><van-field v-model="password" placeholder="请输入密码" type="password" /></van-dialog>
-				<list title="性别" :tip="['女', '男'].splice(datas.gender, 1)[0]" @click.native="showgender=true"/>
+				<list title="性别" :tip="['女', '男'][datas.gender]" @click.native="showgender=true"/>
 				<van-action-sheet v-model="showgender" :actions="actions" @select="onSelect" close-on-click-action/>
 			</div>
 			<div class="foot"></div>
@@ -77,7 +77,7 @@ export default {
 		},
 		handler(datas) {
 			const users = JSON.parse(localStorage.getItem('userInfo'));
-			this.$axios({
+			return this.$axios({
 				url: '/user_update/' + users.user.id,
 				method: 'post',
 				headers: {
@@ -89,8 +89,10 @@ export default {
 			});
 		},
 		conf(){
-			this.handler({nickname:this.dataname})
-			this.datas.nickname = this.dataname
+			const request = this.handler({nickname:this.dataname})
+			request.then(()=>{
+				this.datas.nickname = this.dataname
+			})
 		},
 		pwd(){
 			this.handler({password:this.password})
@@ -98,9 +100,11 @@ export default {
 		onSelect(item) {
 		// 默认情况下点击选项时不会自动收起
 		// 可以通过 close-on-click-action 属性开启自动收起
-		this.handler({gender:item.value})
+		const request = this.handler({gender:item.value})
 		// console.log(item)
-		this.datas.gender = item.value
+		request.then(() => {
+			this.datas.gender = item.value
+		})
 		}
 	}
 };

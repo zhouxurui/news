@@ -1,12 +1,12 @@
 <template>
 	<div>
-		<div class="middle_list">
-			<div class="list_left">{{title}}</div>
-			<div class="list_right">
-				<span class="user">{{tip}}</span>
-				<span class="listr iconfont iconjiantou1"></span>
+			<div class="middle_list">
+				<div class="list_left">{{title}}</div>
+				<div class="list_right">
+					<span class="user">{{tip}}</span>
+					<span class="listr iconfont iconjiantou1"></span>
+				</div>
 			</div>
-		</div>
 	</div>
 </template>
 
