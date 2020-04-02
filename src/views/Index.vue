@@ -14,13 +14,13 @@
 					<router-link to="#"><span class="iconfont iconwode tubiao1"></span></router-link>
 				</div>
 				<van-tabs v-model="active" sticky swipeable>
-					<van-tab v-for="(item, index) in list" :title="item">
-						<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+					<van-tab v-for="(item, index) in list" :title="item.name">
+						<van-list v-model="list[active].loading" :finished="list[active].finished" finished-text="没有更多了" @load="onLoad" :immediate-check="false">
 							<!-- <van-cell v-for="item in list" :key="item" :title="item" /> -->
-							<div v-for="(item, index) in arr" >
-								<index1></index1>
-								<index2></index2>
-								<index3></index3>
+							<div v-for="(item, index) in list[active].post" >
+								<index1 v-if="item.type === 1 && item.cover.length > 0 && item.cover.length < 3" :data="item"></index1>
+								<index2 v-if="item.type === 1 && item.cover.length >= 3 " :data="item"></index2>
+								<index3 v-if="item.type === 2" :data="item"></index3>
 							</div>
 						</van-list>
 					</van-tab>
@@ -38,11 +38,8 @@ import index3 from '@/components/index3.vue';
 export default {
 	data() {
 		return {
-			arr:[1,1],
-			list: ['关注', '头条', '娱乐', '体育', '汽车', '房产', '体育', '汽车', '房产', '﹀'],
-			active: 0,
-			loading: false,
-			finished: false
+			list: [],
+			active: 0
 		};
 	},
 	components: {
@@ -50,24 +47,98 @@ export default {
 		index2,
 		index3
 	},
+	watch:{
+		active(){
+			this.update()
+		}
+	},
+	mounted(){
+		const indexData = JSON.parse(localStorage.getItem('indexData'))
+		const {token} = JSON.parse(localStorage.getItem('userInfo')) || {}
+		if(indexData){
+			if(indexData[0].name !== '关注' && token){
+				this.categories(token)
+			}
+			if(indexData[0].name === '关注' && !token){
+				this.categories()
+			}
+			this.list = indexData
+			this.categoriesIndex()
+			this.update()
+		}else{
+			this.categories(token)			
+		}
+	},
 	methods:{
+		//滚动加载事件
 	 onLoad() {
-      // 异步更新数据
-      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        for (let i = 0; i < 10; i++) {
-          this.arr.push(this.arr.length + 1);
-        }
-
-        // 加载状态结束
-        this.loading = false;
-
-        // 数据全部加载完成
-        if (this.arr.length >= 8) {
-          this.finished = true;
-        }
-      }, 3000);
-    }
+			 this.list[this.active].pageIndex += 1
+			 this.$axios({
+			 			 url:"post",
+			 			 params:{
+			 			 	category:this.list[this.active].id,
+			 			 	pageIndex:this.list[this.active].pageIndex,
+			 			 	pageSize:5
+			 			 } 
+			 }).then(res => {
+			 			 const {data,total} = res.data
+			 			 this.list[this.active].post = [...this.list[this.active].post,...data]
+			 			 this.list[this.active].loading = false
+			 			 if(this.list[this.active].post.length === total){
+			 				  this.list[this.active].finished = true;
+			 			 }
+						  this.list = [...this.list]
+			 })
+    },
+	//渲染导航列表
+	categories(token){
+		const path = {
+			url:"/category",
+		}
+		if(token){
+			path.headers = {
+				Authorization: token
+			}
+		}
+		this.$axios(path).then(res => {
+			console.log(res)
+			const {data} = res.data
+			data.push({
+				name:"﹀"
+			})
+			this.list = data
+			localStorage.setItem('indexData',JSON.stringify(data))
+			this.categoriesIndex()
+			this.update()
+		})
+	},
+	//给每个导航添加新属性
+	categoriesIndex(){
+		this.list.map(v => {
+			v.pageIndex=1
+			v.post=[]
+			v.loading = false
+			v.finished = false
+			return v
+		})
+	},
+	//渲染文章数据
+	update(){
+		this.categoriesIndex()
+		this.$axios({
+			url:"/post",
+			params:{
+				category:this.list[this.active].id,
+				pageIndex:1,
+				pageSize:5
+			}
+		}).then(res => {
+			// console.log(res)
+			const {data} = res.data
+			this.list[this.active].post = data
+			this.list = [...this.list]
+		})
+	}
 	}
 };
 </script>

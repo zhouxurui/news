@@ -1,17 +1,21 @@
 <template>
 	<div class="list">
 		<div class="left">
-			<h4>林志玲穿透视黑纱裙米兰看秀 腹部微隆显孕味</h4>
+			<h4>{{data.title}}</h4>
 			<span>
-				火星时报
-				<em>52跟帖</em>
+				{{data.user.nickname}}
+				<em>{{data.comment_length}}跟帖</em>
 			</span>
 		</div>
-		<img src="../assets/u11.jpg" />
+		<img :src="$axios.defaults.baseURL+data.cover[0].url" />
 	</div>
 </template>
 
-<script></script>
+<script>
+	export default{
+		props:['data']
+	}
+</script>
 
 <style lang="less" scoped="scoped">
 .list {

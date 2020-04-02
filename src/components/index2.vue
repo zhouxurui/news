@@ -1,19 +1,21 @@
 <template>
 	<div class="lists">
-		<h4>亚马逊雨林为何燃烧？除了新总统“急功近利”的开发，国际资本才是真凶</h4>
+		<h4>{{data.title}}</h4>
 		<div class="img">
-			<img src="../assets/u15.jpg">
-			<img src="../assets/u15.jpg">
-			<img src="../assets/u11.jpg">
+			<img :src="$axios.defaults.baseURL +item.url" v-for="(item,index) in data.cover">
 		</div>
 		<span>
-			火星时报    
-			<em>52跟帖</em>
+			{{data.user.nickname}}    
+			<em>{{data.comment_length}}跟帖</em>
 		</span>
 	</div>
 </template>
 
-<script></script>
+<script>
+	export default{
+		props:['data']
+	}
+</script>
 
 <style lang="less" scoped="scoped">
 .lists{

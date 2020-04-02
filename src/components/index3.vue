@@ -1,20 +1,23 @@
 <template>
 		<div class="lists">
-		<h4>美军与英军联合训练 6机编队阵容强大</h4>
+		<h4>{{data.title}}</h4>
 		<div class="img">
-			<img src="../assets/u19.jpg">
+			<img :src="$axios.defaults.baseURL+data.cover[0].url">
 			<div class="shipin">
 				<span class="iconfont iconshipin tubiao"></span>
 			</div>
 		</div>
 		<span>
-			火星时报    
-			<em>52跟帖</em>
+			{{data.user.nickname}}   
+			<em>{{data.comment_length}}跟帖</em>
 		</span>
 	</div>
 </template>
 
 <script>
+	export default{
+		props:['data']
+	}
 </script>
 
 <style lang="less" scoped="scoped">
