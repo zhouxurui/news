@@ -5,7 +5,7 @@
 			<div class="middle">
 				<div class="middle_search">
 					<span class="iconfont iconnew tubiao"></span>
-					<router-link to="#" class="sea_div">
+					<router-link to="/search" class="sea_div">
 						<div>
 							<span class="iconfont iconsearch sea_span"></span>
 							<span class="sea_span1">搜索新闻</span>
@@ -13,13 +13,13 @@
 					</router-link>
 					<router-link to="#"><span class="iconfont iconwode tubiao1"></span></router-link>
 				</div>
-				<van-tabs v-model="active" sticky swipeable>
-					<van-tab v-for="(item, index) in list" :title="item.name">
+				<van-tabs v-model="active" sticky swipeable @scroll="handScroll">
+					<van-tab v-for="(item, index) in list" v-if="item.is_top === 1 || item.name === '﹀'" :title="item.name">
 						<van-list v-model="list[active].loading" :finished="list[active].finished" finished-text="没有更多了" @load="onLoad" :immediate-check="false">
 							<!-- <van-cell v-for="item in list" :key="item" :title="item" /> -->
-							<div v-for="(item, index) in list[active].post" >
+							<div v-for="(item, index) in list[active].post">
 								<index1 v-if="item.type === 1 && item.cover.length > 0 && item.cover.length < 3" :data="item"></index1>
-								<index2 v-if="item.type === 1 && item.cover.length >= 3 " :data="item"></index2>
+								<index2 v-if="item.type === 1 && item.cover.length >= 3" :data="item"></index2>
 								<index3 v-if="item.type === 2" :data="item"></index3>
 							</div>
 						</van-list>
@@ -39,7 +39,8 @@ export default {
 	data() {
 		return {
 			list: [],
-			active: 0
+			active: 0,
+			token:""
 		};
 	},
 	components: {
@@ -47,98 +48,114 @@ export default {
 		index2,
 		index3
 	},
-	watch:{
-		active(){
-			this.update()
-		}
-	},
-	mounted(){
-		const indexData = JSON.parse(localStorage.getItem('indexData'))
-		const {token} = JSON.parse(localStorage.getItem('userInfo')) || {}
-		if(indexData){
-			if(indexData[0].name !== '关注' && token){
-				this.categories(token)
-			}
-			if(indexData[0].name === '关注' && !token){
-				this.categories()
-			}
-			this.list = indexData
-			this.categoriesIndex()
-			this.update()
-		}else{
-			this.categories(token)			
-		}
-	},
-	methods:{
-		//滚动加载事件
-	 onLoad() {
-			 this.list[this.active].pageIndex += 1
-			 this.$axios({
-			 			 url:"post",
-			 			 params:{
-			 			 	category:this.list[this.active].id,
-			 			 	pageIndex:this.list[this.active].pageIndex,
-			 			 	pageSize:5
-			 			 } 
-			 }).then(res => {
-			 			 const {data,total} = res.data
-			 			 this.list[this.active].post = [...this.list[this.active].post,...data]
-			 			 this.list[this.active].loading = false
-			 			 if(this.list[this.active].post.length === total){
-			 				  this.list[this.active].finished = true;
-			 			 }
-						  this.list = [...this.list]
-			 })
-    },
-	//渲染导航列表
-	categories(token){
-		const path = {
-			url:"/category",
-		}
-		if(token){
-			path.headers = {
-				Authorization: token
-			}
-		}
-		this.$axios(path).then(res => {
-			console.log(res)
-			const {data} = res.data
-			data.push({
-				name:"﹀"
+	watch: {
+		active() {
+			const arr = this.list.filter((item)=>{
+				return item.is_top === 1 || item.name === '﹀'
 			})
-			this.list = data
-			localStorage.setItem('indexData',JSON.stringify(data))
-			this.categoriesIndex()
-			this.update()
-		})
-	},
-	//给每个导航添加新属性
-	categoriesIndex(){
-		this.list.map(v => {
-			v.pageIndex=1
-			v.post=[]
-			v.loading = false
-			v.finished = false
-			return v
-		})
-	},
-	//渲染文章数据
-	update(){
-		this.categoriesIndex()
-		this.$axios({
-			url:"/post",
-			params:{
-				category:this.list[this.active].id,
-				pageIndex:1,
-				pageSize:5
+			if(this.active === arr.length - 1){
+				this.$router.push('/manage')
 			}
-		}).then(res => {
-			// console.log(res)
-			const {data} = res.data
-			this.list[this.active].post = data
-			this.list = [...this.list]
-		})
-	}
+			this.update();
+			setTimeout(()=>{
+				window.scrollTo(0,this.list[this.active].scrollY)
+			},20)
+		}
+	},
+	mounted() {
+		const indexData = JSON.parse(localStorage.getItem('indexData'));
+		const { token } = JSON.parse(localStorage.getItem('userInfo')) || {};
+		this.token = token
+		if (indexData) {
+			if (indexData[0].name !== '关注' && token) {
+				this.categories(token);
+			}
+			if (indexData[0].name === '关注' && !token) {
+				this.categories();
+			}
+			this.list = indexData;
+			this.categoriesIndex();
+		} else {
+			this.categories(token);
+		}
+		this.update();
+	},
+	methods: {
+		//滚动加载事件
+		onLoad() {
+			this.update()
+		},
+		//渲染导航列表
+		categories(token) {
+			const path = {
+				url: '/category'
+			};
+			if (token) {
+				path.headers = {
+					Authorization: token
+				};
+			}
+			this.$axios(path).then(res => {
+				console.log(res);
+				const { data } = res.data;
+				data.push({
+					name: '﹀'
+				});
+				this.list = data;
+				this.categoriesIndex();
+				localStorage.setItem('indexData', JSON.stringify(data));
+			});
+		},
+		//给每个导航添加属性
+		categoriesIndex() {
+			this.list.map(v => {
+				v.pageIndex = 1;
+				v.post = [];
+				v.loading = false;
+				v.finished = false;
+				v.scrollY = 0;
+				v.isload = false
+				return v;
+			});
+		},
+		//渲染文章数据
+		update() {
+			const {name,pageIndex} = this.list[this.active]
+			if(this.list[this.active].isload) return
+			this.list[this.active].isload = true
+			this.list[this.active].pageIndex += 1;
+			if(this.list[this.active].finished){
+				return
+			}
+			const posts = {
+				url: 'post',
+				params: {
+					category: this.list[this.active].id,
+					pageIndex,
+					pageSize: 5
+				}
+			}
+			if(name === '关注'){
+				posts.headers = {
+					Authorization: this.token
+				}
+			}
+			this.$axios(posts).then(res => {
+				const { data, total } = res.data;
+				this.list[this.active].post = [...this.list[this.active].post, ...data];
+				this.list = [...this.list];
+				this.list[this.active].loading = false;
+				if (this.list[this.active].post.length === total) {
+					this.list[this.active].finished = true;
+				}
+				this.list[this.active].isload = false
+			});
+		},
+		handScroll({scrollTop}){
+			if(this.list[this.active]){
+				this.list[this.active].scrollY = scrollTop
+			}
+		}
 	}
 };
 </script>
@@ -223,7 +240,7 @@ export default {
 /deep/ .van-tabs__wrap {
 	padding-right: 20px;
 }
-/deep/.van-sticky--fixed{
+/deep/.van-sticky--fixed {
 	width: 360px;
 	margin: 0 auto;
 }

@@ -58,6 +58,16 @@ const routes = [
 		meta: {
 			author: true
 		}
+	},
+	{
+		path: '/manage',
+		//懒加载
+		component: () => import('@/views/Manage.vue')
+	},
+	{
+		path: '/search',
+		//懒加载
+		component: () => import('@/views/Search.vue')
 	}
 ]
 
