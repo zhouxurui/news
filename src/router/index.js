@@ -68,6 +68,11 @@ const routes = [
 		path: '/search',
 		//懒加载
 		component: () => import('@/views/Search.vue')
+	},
+	{
+		path: '/detail/:id',
+		//懒加载
+		component: () => import('@/views/Detail.vue')
 	}
 ]
 

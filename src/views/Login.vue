@@ -43,7 +43,11 @@ export default {
 					console.log(res.data)
 					const {data} = res.data
 					localStorage.setItem('userInfo',JSON.stringify(data))
-					this.$router.push('/personal')
+					if(this.$route.query.url_id){
+						this.$router.replace(this.$route.query.url_id)
+					}else{
+						this.$router.push('/personal')
+					}
 		  	})
 			
 		}

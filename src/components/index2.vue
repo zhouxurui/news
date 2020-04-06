@@ -1,5 +1,5 @@
 <template>
-	<div class="lists">
+	<div class="lists"  @click="$router.push(`/detail/${data.id}`)">
 		<h4>{{data.title}}</h4>
 		<div class="img">
 			<img :src="$axios.defaults.baseURL +item.url" v-for="(item,index) in data.cover">
