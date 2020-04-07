@@ -39,6 +39,7 @@
 	import index2 from '@/components/index2.vue';
 	import index3 from '@/components/index3.vue';
 	export default{
+		name:"search",
 		data(){
 			return {
 				value:'',
@@ -89,7 +90,14 @@
 				this.show = true
 				this.hande()
 			}
-		}
+		},
+		 beforeRouteEnter (to, from, next){
+			 next(vm => {
+				 if(from.path === '/'){
+				 	vm.value = ''		 
+				 }
+			 })
+		 }
 	}
 </script>
 

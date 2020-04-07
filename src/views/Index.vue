@@ -36,6 +36,7 @@ import index1 from '@/components/index1.vue';
 import index2 from '@/components/index2.vue';
 import index3 from '@/components/index3.vue';
 export default {
+	name:'index',
 	data() {
 		return {
 			list: [],

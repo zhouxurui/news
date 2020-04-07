@@ -1,5 +1,5 @@
 <template>
-		<div class="lists">
+		<div class="lists" @click="$router.push(`/video/${data.id}`)">
 		<h4>{{data.title}}</h4>
 		<div class="img">
 			<img :src="$axios.defaults.baseURL+data.cover[0].url">

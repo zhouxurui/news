@@ -5,22 +5,9 @@
 			<div class="middle">
 				<tab title="我的收藏" :home="false" class="tab" />
 				<div v-for="(item,index) in datas">
-					<div class="list" v-if="item.cover.length < 2 && item.cover.length > 0">
-						<div class="left">
-							<h4>{{item.title}}</h4>
-							<span>{{item.user.nickname}}    <em>{{item.comments.length}}跟帖</em></span>
-						</div>
-						<img :src="'http://127.0.0.1:3000' + item.user.head_img">
-					</div>
-					<div class="lists" v-if="item.cover.length > 2">
-						<h4>{{item.title}}</h4>
-						<div class="img">
-							<img src="../assets/logo.png">
-							<img src="../assets/logo.png">
-							<img src="../assets/logo.png">
-						</div>
-						<span>{{item.user.nickname}}    <em>{{item.comments.length}}跟帖</em></span>
-					</div>
+					<index1 v-if="item.type === 1 && item.cover.length > 0 && item.cover.length < 3" :data="item"></index1>
+					<index2 v-if="item.type === 1 && item.cover.length >= 3" :data="item"></index2>
+					<index3 v-if="item.type === 2" :data="item"></index3>
 				</div> 
 			</div>
 			<div class="foot"></div>
@@ -29,6 +16,9 @@
 </template>
 
 <script>
+import index1 from '@/components/index1.vue';
+import index2 from '@/components/index2.vue';
+import index3 from '@/components/index3.vue';
 import tab from '@/components/tab.vue';
 export default {
 	data(){
@@ -37,7 +27,10 @@ export default {
 		}
 	},
 	components: {
-		tab
+		tab,
+		index1,
+		index2,
+		index3
 	},
 	mounted(){
 		const users = JSON.parse(localStorage.getItem('userInfo'));

@@ -73,6 +73,11 @@ const routes = [
 		path: '/detail/:id',
 		//懒加载
 		component: () => import('@/views/Detail.vue')
+	},
+	{
+		path: '/video/:id',
+		//懒加载
+		component: () => import('@/views/Video.vue')
 	}
 ]
 

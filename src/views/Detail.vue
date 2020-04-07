@@ -16,8 +16,8 @@
 				</div>
 				<div class="mian_bottom">
 					<span class="bottom_span">
-						<span class="iconfont icondianzan"></span>
-						<i class="span_i">{{+(list.has_star)}}</i>
+						<span class="iconfont icondianzan" :class="list.has_like?'active1':''" @click="handelike"></span>
+						<i class="span_i">{{list.like_length || 0}}</i>
 					</span>
 					<span class="bottom_span">
 						<span class="iconfont iconweixin tubiao2"></span>
@@ -25,16 +25,7 @@
 					</span>
 				</div>
 			</div>
-			<div class="middle_foot">
-				<span class="input">写跟帖</span>
-				<div>
-					<span class="iconfont iconpinglun- right rights">
-						<span class="rights_son">{{list.comment_length}}</span>
-					</span>
-					<span class="iconfont iconshoucang right"></span>
-					<span class="iconfont iconfenxiang right"></span>
-				</div>
-			</div>
+			<midfoot :list="list"/>
 		</div>
 		<!-- <div class="foot"></div> -->
 		</div>
@@ -42,19 +33,32 @@
 
 <script>
 	import moment from 'moment'
+	import midfoot from '@/components/Middle_foot.vue'
 	export default{
+		components:{
+			midfoot,
+		},
 		data(){
 			return {
 				list:{
 					user:{}
 				},
 				moment,
+				token:''
 			}
 		},
 		mounted(){
-			this.$axios({
+			const {token} = JSON.parse(localStorage.getItem('userInfo')) || ''
+			this.token = token
+			const urls = {
 				url:'/post/' + this.$route.params.id,
-			}).then(res => {
+			}
+			if(token){
+				urls.headers = {
+					Authorization: token
+				}
+			}
+			this.$axios(urls).then(res => {
 				console.log(res)
 				const {data} = res.data
 				this.list = data
@@ -62,17 +66,43 @@
 		},
 		methods:{
 			handefol(){
-				const {token} = JSON.parse(localStorage.getItem('userInfo')) || ''
+				let url;
+				if(this.list.has_follow){
+					url = '/user_unfollow/' + this.list.user.id
+				}else{
+					url = '/user_follows/' + this.list.user.id
+				}
 				this.$axios({
-					url:'/user_follows/' + this.list.user.id,
+					url,
 					headers: {
-						Authorization: token
+						Authorization: this.token
 					}
 				}).then(res => {
 					console.log(res)
-					if(res.status === 200){
+					this.list.has_follow = !this.list.has_follow
+					if(this.list.has_follow){
 						this.list.has_follow = true
+						this.$toast(res.data.message)
+					}else{
+						this.list.has_follow = false
+						this.$toast(res.data.message)
 					}
+				})
+			},
+			handelike(){
+				this.$axios({
+					url:'/post_like/' + this.list.id,
+					headers: {
+						Authorization: this.token
+					}
+				}).then(res => {
+					this.list.has_like = !this.list.has_like
+					if(this.list.has_like){
+						this.list.like_length += 1
+					}else{
+						this.list.like_length -= 1
+					}
+					this.$toast(res.data.message)
 				})
 			}
 		}
@@ -156,47 +186,9 @@
 						.tubiao2{
 							color: #1ec21e;
 						}
-					}
-				}
-			}
-			.middle_foot{
-				background: rgba(242, 242, 242, 1);
-				position: fixed;
-				bottom: 0;
-				left: 0;
-				width: 360px;
-				height: 48px;
-				display: flex;
-				justify-content: space-around;
-				margin-left:8px;
-				padding: 0 15px;
-				align-items: center;
-				border-top: 1px solid #ccc;
-				.input{
-					flex: 1;
-					background: rgba(215, 215, 215, 1);
-					border-radius: 50px;
-					line-height: 32px;
-					text-indent: 1em;
-				}
-				.right{
-					font-size: 20px;
-					margin-left: 34px;
-				}
-				.rights{
-					position: relative;
-					.rights_son{
-						position: absolute;
-						right: -14px;
-						top: -6px;
-						color: #fff;
-						background: #f00;
-						width: 26px;
-						line-height: 16px;
-						// padding: 0 5px;
-						font-size: 12px;
-						border-radius: 50px;
-						text-align: center;
+						.active1{
+							color: #f00;
+						}
 					}
 				}
 			}
