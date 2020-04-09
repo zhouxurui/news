@@ -81,6 +81,13 @@ export default {
 		}
 		this.update();
 	},
+	beforeRouteEnter (to, from, next){
+				 next(vm => {
+					 if(from.path === '/manage'){
+					 	vm.active = 0		 
+					 }
+				 })
+	},
 	methods: {
 		//滚动加载事件
 		onLoad() {

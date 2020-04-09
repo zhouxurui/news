@@ -1,6 +1,6 @@
 <template>
 	<div class="middle_foot">
-		<span class="input">写跟帖</span>
+		<span class="input" @click="$router.push('/post_comment/'+list.id)">写跟帖</span>
 		<div>
 			<span class="iconfont iconpinglun- right rights">
 				<span class="rights_son">{{list.comment_length}}</span>

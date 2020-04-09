@@ -78,6 +78,11 @@ const routes = [
 		path: '/video/:id',
 		//懒加载
 		component: () => import('@/views/Video.vue')
+	},
+	{
+		path: '/post_comment/:id',
+		//懒加载
+		component: () => import('@/views/Post_comment.vue')
 	}
 ]
 
