@@ -11,21 +11,21 @@
 								<img :src="$axios.defaults.baseURL + item.user.head_img" />
 								<div class="user">
 									<h5>{{ item.user.nickname }}</h5>
-									<span class="user_span">{{ moment(item.user.create_date).fromNow() }}</span>
+									<span class="user_span">{{ moment(item.create_date).fromNow() }}</span>
 								</div>
 							</div>
-							<span class="replay">回复</span>
+							<span class="replay" @click="handerep(item)">回复</span>
 						</div>
-						<replay v-if="item.parent" :data="item.parent"></replay>
+						<replay v-if="item.parent" :data="item.parent" @replay="handerep"></replay>
 						<p class="list_p">{{ item.content }}</p>
 					</div>
 				</div>
 			</van-list>
 		</div>
 		<div class="bottom">
-			<van-field v-model="message" :rows="rows" autosize label="留言" type="textarea" placeholder="说点什么..."  
-			class="fie" @focus="handefous" :class="fous?'active':''" @blur="handeblur"/>
-			<span class="fabu" v-if="fous">发布</span>
+			<van-field v-model="message" :rows="rows" :autosize="!fous" type="textarea" :placeholder="replay.user?'回复@'+replay.user.nickname:'说点什么...'"  
+			class="fie" @focus="handefous" :class="fous?'active':''" @blur="handeblur" ref="ref"  @keyup.enter="handefabu"/>
+			<span class="fabu" v-if="fous" @click="handefabu">发布</span>
 		</div>
 	</div>
 </template>
@@ -47,7 +47,8 @@ export default {
 			open: false,
 			message: '',
 			fous: false,
-			rows: 1
+			rows: 1,
+			replay:''
 		};
 	},
 	components: {
@@ -86,11 +87,49 @@ export default {
 		},
 		handefous(){
 			this.fous = true
-			this.rows = 3
 		},
 		handeblur(){
-			this.fous = false
-			this.rows = 1
+			setTimeout(() => {
+				this.fous = false
+				if(this.message === ''){
+					this.replay = ''
+				}
+			},100)
+		},
+		handefabu(){
+			if(this.message.trim() === '') {
+				return
+			}
+			const {token} = JSON.parse(localStorage.getItem('userInfo')) || {}
+			const data = {
+					content: this.message
+				}
+			if(this.replay.id){
+				data.parent_id = this.replay.id
+			}
+			
+			this.$axios({
+				url:'/post_comment/' + this.$route.params.id,
+				headers: {
+					Authorization: token
+				},
+				method:'post',
+				data
+			}).then(res => {
+				this.list = []
+				this.pageIndex = 1
+				this.hander()
+				this.message =''
+				this.replay = ''
+			})
+		},
+		handerep(item){
+			setTimeout(() => {
+				this.replay = item
+				console.log(this.replay)
+				this.fous = true
+				this.$refs.ref.focus()
+			},300)
 		}
 	}
 };
@@ -162,7 +201,6 @@ export default {
 		align-items: flex-end;
 		.fie{
 			border-radius: 50px;
-			margin-right: 15px;
 		}
 		.active{
 			height: 82px;
@@ -175,6 +213,7 @@ export default {
 			color: #fff;
 			border-radius: 50px;
 			text-align: center;
+			font-size: 14px;
 		}
 	}
 }

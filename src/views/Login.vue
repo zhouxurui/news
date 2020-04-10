@@ -3,7 +3,7 @@
 		<div class="w">
 			<div class="top"></div>
 			<div class="middle">
-				<span class="iconfont iconicon-test"></span>
+				<span class="iconfont iconicon-test" @click="$router.back()"></span>
 				<div class="iconfont iconnew"></div>
 				<van-form @submit="onSubmit" class="form">
 					<van-field v-model="form.username"  placeholder="用户名 / 手机号" :rules="[{ required: true, message: '请输入账号' }]" />

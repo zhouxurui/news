@@ -4,13 +4,13 @@
 		<div class="replay_top">
 			<div class="user_id">
 				<span class="user_id_span">{{data.user.nickname}}</span>
-				<span class="user_id_span1">{{moment(data.user.create_date).fromNow()}}</span>
+				<span class="user_id_span1">{{moment(data.create_date).fromNow()}}</span>
 			</div>
-			<span class="replay_top_span">回复</span>
+			<span class="replay_top_span" @click="hande(data)">回复</span>
 		</div>
 		<p class="replay_p">{{data.content}}</p>
 	</div>
-	<repalys v-if="data.parent" :data="data.parent"></repalys>
+	<repalys v-if="data.parent" :data="data.parent" @replay="hande"></repalys>
 </div>
 </template>
 
@@ -23,6 +23,11 @@
 		data(){
 			return {
 				moment
+			}
+		},
+		methods:{
+			hande(datas){
+				this.$emit('replay',datas)
 			}
 		}
 	}

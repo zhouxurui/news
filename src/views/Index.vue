@@ -11,7 +11,7 @@
 							<span class="sea_span1">搜索新闻</span>
 						</div>
 					</router-link>
-					<router-link to="#"><span class="iconfont iconwode tubiao1"></span></router-link>
+					<router-link to="/login"><span class="iconfont iconwode tubiao1"></span></router-link>
 				</div>
 				<van-tabs v-model="active" sticky swipeable @scroll="handScroll">
 					<van-tab v-for="(item, index) in list" v-if="item.is_top === 1 || item.name === '﹀'" :title="item.name">
@@ -64,31 +64,36 @@ export default {
 		}
 	},
 	mounted() {
-		const indexData = JSON.parse(localStorage.getItem('indexData'));
-		const { token } = JSON.parse(localStorage.getItem('userInfo')) || {};
-		this.token = token
-		if (indexData) {
-			if (indexData[0].name !== '关注' && token) {
-				this.categories(token);
-			}
-			if (indexData[0].name === '关注' && !token) {
-				this.categories();
-			}
-			this.list = indexData;
-			this.categoriesIndex();
-		} else {
-			this.categories(token);
-		}
-		this.update();
+		this.reloads()
 	},
 	beforeRouteEnter (to, from, next){
 				 next(vm => {
 					 if(from.path === '/manage'){
-					 	vm.active = 0		 
+					 	vm.active = 0
+						vm.reloads()
 					 }
 				 })
 	},
 	methods: {
+		//封装reload事件
+		reloads(){
+			const indexData = JSON.parse(localStorage.getItem('indexData'));
+			const { token } = JSON.parse(localStorage.getItem('userInfo')) || {};
+			this.token = token
+			if (indexData) {
+				if (indexData[0].name !== '关注' && token) {
+					this.categories(token);
+				}
+				if (indexData[0].name === '关注' && !token) {
+					this.categories();
+				}
+				this.list = indexData;
+				this.categoriesIndex();
+			} else {
+				this.categories(token);
+			}
+			this.update();
+		},
 		//滚动加载事件
 		onLoad() {
 			this.update()
