@@ -118,6 +118,7 @@ export default {
 			}).then(res => {
 				this.list = []
 				this.pageIndex = 1
+				this.finished = false
 				this.hander()
 				this.message =''
 				this.replay = ''
